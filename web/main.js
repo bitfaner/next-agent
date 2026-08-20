@@ -33,10 +33,12 @@ function renderFeed(active = 0) {
   if (!feed) return;
   feed.innerHTML = "";
   const visible = events.slice(active, active + 3).concat(events.slice(0, Math.max(0, active + 3 - events.length)));
+  const rows = [];
 
   visible.forEach((event, index) => {
     const row = document.createElement("div");
     row.className = "feed-row";
+    row.style.setProperty("--row-index", index);
     row.innerHTML = `
       <div class="feed-time">${event.time}</div>
       <div class="feed-body">
@@ -46,6 +48,13 @@ function renderFeed(active = 0) {
     `;
     if (index === 0) row.style.borderColor = "rgba(151, 212, 106, 0.35)";
     feed.appendChild(row);
+    rows.push(row);
+  });
+
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      rows.forEach((row) => row.classList.add("is-entering"));
+    });
   });
 }
 
@@ -53,8 +62,14 @@ let pointer = 0;
 renderFeed(pointer);
 
 window.setInterval(() => {
-  pointer = (pointer + 1) % events.length;
-  renderFeed(pointer);
+  if (!feed || document.hidden) return;
+
+  feed.classList.add("is-updating");
+  window.setTimeout(() => {
+    pointer = (pointer + 1) % events.length;
+    renderFeed(pointer);
+    feed.classList.remove("is-updating");
+  }, 260);
 }, 2400);
 
 if (copyButton) {

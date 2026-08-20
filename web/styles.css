@@ -104,6 +104,24 @@ code {
 .nav {
   display: flex;
   gap: 20px;
+  align-items: center;
+}
+
+.github-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(17, 23, 29, 0.78);
+  color: var(--text);
+}
+
+.github-icon {
+  width: 18px;
+  height: 18px;
 }
 
 .section-band {
@@ -170,6 +188,46 @@ code {
   max-width: 62ch;
   margin-top: 18px;
   font-size: 1.08rem;
+}
+
+.download-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.download-button {
+  display: grid;
+  gap: 4px;
+  min-height: 64px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(17, 23, 29, 0.6);
+  color: var(--text);
+}
+
+.download-button.primary {
+  border-color: rgba(151, 212, 106, 0.4);
+  background: linear-gradient(180deg, rgba(151, 212, 106, 0.16), rgba(17, 23, 29, 0.9));
+}
+
+.download-platform {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.download-meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.download-button:hover,
+.github-link:hover,
+.cta:hover {
+  border-color: rgba(151, 212, 106, 0.55);
+  background-color: rgba(21, 28, 35, 0.86);
 }
 
 .cta-row {
@@ -317,6 +375,7 @@ code {
 .stream-feed {
   display: grid;
   gap: 10px;
+  min-height: 230px;
 }
 
 .feed-row {
@@ -328,6 +387,19 @@ code {
   border: 1px solid var(--line-soft);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.015);
+  opacity: 1;
+  transform: none;
+  will-change: opacity, transform;
+}
+
+.feed-row.is-entering {
+  animation: feed-in 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--row-index, 0) * 90ms);
+}
+
+.stream-feed.is-updating .feed-row {
+  animation: feed-out 260ms ease-in both;
+  animation-delay: calc((2 - var(--row-index, 0)) * 45ms);
 }
 
 .feed-time {
@@ -349,6 +421,24 @@ code {
   color: var(--muted);
   font-size: 0.88rem;
   line-height: 1.45;
+}
+
+@keyframes feed-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes feed-out {
+  to {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
 }
 
 .status-row {
@@ -507,10 +597,15 @@ code {
     font-size: clamp(2.35rem, 12vw, 3.4rem);
   }
 
+  .download-row,
   .command-strip,
   .window-body,
   .steps {
     grid-template-columns: 1fr;
+  }
+
+  .feed-row {
+    animation-duration: 420ms;
   }
 
   .workspace-column {
@@ -520,5 +615,42 @@ code {
 
   .status-row {
     gap: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .feed-row.is-entering {
+    animation-name: feed-fade-in;
+    animation-duration: 180ms;
+  }
+
+  .stream-feed.is-updating .feed-row {
+    animation-name: feed-fade-out;
+    animation-duration: 120ms;
+  }
+}
+
+@keyframes feed-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes feed-fade-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: none;
   }
 }
