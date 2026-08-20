@@ -1,52 +1,52 @@
 # AGENTS.md
 
-这是一个本地桌面代理项目。修改时优先保持现有架构和接口稳定，不要把它改成新的产品形态。
+This is a local desktop agent project. When making modifications, prioritize maintaining the stability of the existing architecture and interfaces; do not transform it into a new product form.
 
-## 项目目标
+## Project Goals
 
-- Tauri 壳子负责启动桌面应用并加载 React 前端。
-- React 前端负责工作区、会话、消息流、图片输入和授权卡片展示。
-- Go 后端负责 JSON-RPC、SSE、Codex CLI 调度和 SQLite 持久化。
-- SQLite 只存本地数据，不引入远端依赖。
+- The Tauri shell is responsible for launching the desktop application and loading the React frontend.
+- The React frontend manages the workspace, sessions, message streams, image inputs, and authorization card display.
+- The Go backend handles JSON-RPC, SSE, Codex CLI orchestration, and SQLite persistence.
+- SQLite only stores local data and introduces no remote dependencies.
 
-## 当前行为
+## Current Behavior
 
-- 工作区必须先选择或创建，才能启动会话。
-- 创建工作区时要通过文件管理器选择本地目录，并保存路径字符串。
-- 启动 Codex 时必须把工作区路径传给子进程。
-- 会话消息、SSE 增量、授权请求、会话状态都会进入本地存储。
-- 点击会话列表可以恢复会话内容，并尝试恢复 Codex thread。
+- A workspace must be selected or created before a session can be started.
+- Creating a workspace requires selecting a local directory via the file manager and saving the path string.
+- The workspace path must be passed to the subprocess when launching Codex.
+- Session messages, SSE deltas, authorization requests, and session states are all saved to local storage.
+- Clicking the session list restores the session content and attempts to resume the Codex thread.
 
-## 代码边界
+## Code Boundaries
 
-- `apps/desktop` 只处理 UI 和 Tauri 相关能力。
-- `backend` 只处理本地服务、Codex 桥接、事件转发和持久化。
-- `scripts/build-sidecars.sh` 负责构建桌面打包所需的后端二进制。
+- `apps/desktop` handles only UI and Tauri-related capabilities.
+- `backend` handles only local services, Codex bridging, event forwarding, and persistence.
+- `scripts/build-sidecars.sh` is responsible for building the backend binaries required for desktop packaging.
 
-## 修改原则
+## Modification Principles
 
-- 优先沿用现有 RPC 方法、数据结构和目录命名。
-- 不要随意重命名 JSON 字段、RPC 方法或 SQLite 列。
-- 只做和当前任务直接相关的改动，避免顺手重构。
-- 发现用户已有未提交改动时，不要回滚它们。
-- 使用 `apply_patch` 做文件修改。
+- Prioritize reusing existing RPC methods, data structures, and directory naming conventions.
+- Do not rename JSON fields, RPC methods, or SQLite columns without cause.
+- Make only changes directly related to the current task; avoid opportunistic refactoring.
+- If uncommitted changes by the user are detected, do not roll them back.
+- Use `apply_patch` to perform file modifications.
 
-## 后端约定
+## Backend Conventions
 
-- JSON-RPC 入口是 `/rpc`，SSE 入口是 `/events/{sessionId}`。
-- 启动会话、恢复会话、发送消息、授权决策都要经过后端。
-- Codex 进程按会话维度管理，停止工作区或会话时要同步停止对应进程。
-- 会话标题目前由首条用户文本自动生成，保留这个行为。
+- The JSON-RPC entry point is `/rpc`, and the SSE entry point is `/events/{sessionId}`.
+- Starting sessions, restoring sessions, sending messages, and authorization decisions must all go through the backend.
+- Codex processes are managed per session; stopping a workspace or session must synchronously terminate the corresponding process.
+- Session titles are currently auto-generated from the first user text message; preserve this behavior.
 
-## 前端约定
+## Frontend Conventions
 
-- 左侧放工作区和会话列表，右侧放对话区。
-- 消息流要能显示文本、图片、流式增量和授权卡片。
-- 新会话前必须有工作区。
-- 会话恢复后要把历史消息和待处理授权带回界面。
+- The left side displays the workspace and session list, while the right side displays the chat area.
+- The message stream must display text, images, streaming deltas, and authorization cards.
+- A workspace must exist before starting a new session.
+- After a session is restored, historical messages and pending authorization requests must be reloaded into the interface.
 
-## 验证建议
+## Verification Suggestions
 
-- 触碰 `backend` 后，优先跑相关 Go 测试。
-- 触碰 `apps/desktop` 后，优先跑前端构建或至少确认 TypeScript 能过。
-- 如果改到打包流程，再检查 `scripts/build-sidecars.sh` 和 Tauri 配置是否一致。
+- After touching `backend`, run the relevant Go tests first.
+- After touching `apps/desktop`, run the frontend build first or at least confirm that TypeScript type-checking passes.
+- If changes affect the packaging workflow, check that `scripts/build-sidecars.sh` aligns with the Tauri configuration.
