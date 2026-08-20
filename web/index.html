@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="NextX Agent is a local desktop shell for running Codex CLI sessions inside a selected workspace."
+    />
+    <title>NextX Agent</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="NextX Agent home">
+          <span class="brand-mark">NX</span>
+          <span class="brand-copy">
+            <strong>NextX Agent</strong>
+            <small>local workspace shell for Codex</small>
+          </span>
+        </a>
+        <nav class="nav">
+          <a href="#workflow">Workflow</a>
+          <a href="#stack">Stack</a>
+          <a href="#build">Build</a>
+        </nav>
+      </header>
+
+      <main id="top">
+        <section class="hero section-band">
+          <div class="section-label">01 the shell</div>
+          <div class="hero-grid">
+            <div class="hero-copy">
+              <p class="eyebrow">Tauri + React + Go + SQLite</p>
+              <h1>A desktop agent surface for local Codex sessions.</h1>
+              <p class="lede">
+                Select a workspace, start a session, stream Codex output, answer authorization
+                requests, and keep the whole conversation on your machine.
+              </p>
+
+              <div class="cta-row">
+                <a class="cta primary" href="#build">Run locally</a>
+                <a class="cta" href="#stack">Inspect architecture</a>
+              </div>
+
+              <div class="command-strip" aria-label="Quick start">
+                <div class="command-block">
+                  <span class="command-title">backend</span>
+                  <code>go run ./cmd/nextx-agent</code>
+                </div>
+                <div class="command-block">
+                  <span class="command-title">desktop</span>
+                  <code>npm install &amp;&amp; npm run dev</code>
+                </div>
+                <button class="copy-button" data-copy="go run ./cmd/nextx-agent\nnpm install && npm run dev" type="button">
+                  copy
+                </button>
+              </div>
+            </div>
+
+            <div class="hero-panel">
+              <div class="window chrome">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <div class="window-body">
+                <div class="workspace-column">
+                  <div class="mini-title">workspaces</div>
+                  <div class="mini-item active">
+                    <strong>next-x</strong>
+                    <span>/home/zane/code/next-x</span>
+                  </div>
+                  <div class="mini-item">
+                    <strong>research</strong>
+                    <span>/home/zane/code/research</span>
+                  </div>
+                  <div class="mini-item">
+                    <strong>shipit</strong>
+                    <span>/home/zane/code/shipit</span>
+                  </div>
+                </div>
+                <div class="stream-column">
+                  <div class="mini-title">live session</div>
+                  <div class="stream-feed" id="stream-feed" aria-live="polite"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="status-row">
+            <span>JSON-RPC /rpc</span>
+            <span>SSE /events/{sessionId}</span>
+            <span>SQLite persistence</span>
+            <span>workspace-aware Codex</span>
+          </div>
+        </section>
+
+        <section class="section-band" id="workflow">
+          <div class="section-label">02 workflow</div>
+          <div class="band-grid">
+            <div class="band-copy">
+              <h2>One local loop, from folder picker to resumed thread.</h2>
+              <p>
+                The app is built around the actual runtime flow in the codebase: create a
+                workspace from a folder picker, start a session, attach text or images, forward
+                authorization decisions, and restore history on reload.
+              </p>
+            </div>
+
+            <div class="steps">
+              <article class="step">
+                <span class="step-index">01</span>
+                <h3>Choose a workspace</h3>
+                <p>The desktop shell opens a folder picker and stores the local path string.</p>
+              </article>
+              <article class="step">
+                <span class="step-index">02</span>
+                <h3>Start a session</h3>
+                <p>The Go backend launches Codex with that directory as the working directory.</p>
+              </article>
+              <article class="step">
+                <span class="step-index">03</span>
+                <h3>Stream everything</h3>
+                <p>Messages, deltas, status updates, and auth cards arrive over SSE.</p>
+              </article>
+              <article class="step">
+                <span class="step-index">04</span>
+                <h3>Resume later</h3>
+                <p>Session history and thread IDs are persisted in SQLite for reload and continue.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-band" id="stack">
+          <div class="section-label">03 stack</div>
+          <div class="stack-grid">
+            <article class="panel">
+              <h3>Desktop shell</h3>
+              <p>Tauri hosts the app on Windows, macOS, and Linux with a native window and local dialog access.</p>
+              <ul>
+                <li>workspace picker</li>
+                <li>file attachment input</li>
+                <li>native packaging targets: dmg, msi, deb</li>
+              </ul>
+            </article>
+            <article class="panel">
+              <h3>Conversation UI</h3>
+              <p>React renders the workspace list, session list, message feed, auth prompts, and image input.</p>
+              <ul>
+                <li>streaming assistant output</li>
+                <li>markdown rendering</li>
+                <li>session restoration</li>
+              </ul>
+            </article>
+            <article class="panel">
+              <h3>Backend bridge</h3>
+              <p>Go exposes JSON-RPC and SSE, bridges to the Codex CLI, and persists the conversation state.</p>
+              <ul>
+                <li>session lifecycle control</li>
+                <li>permission forwarding</li>
+                <li>SQLite-backed history</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="section-band" id="build">
+          <div class="section-label">04 build</div>
+          <div class="build-grid">
+            <div class="build-copy">
+              <h2>Run it in place, or package it for distribution.</h2>
+              <p>
+                The backend reads the Codex binary from `NEXTX_CODEX_BIN`, defaults arguments to
+                `app-server --stdio`, and falls back to the system temp directory for local
+                database storage when needed.
+              </p>
+            </div>
+            <div class="build-block">
+              <div class="mini-title">environment</div>
+              <code>NEXTX_CODEX_BIN=/path/to/codex</code>
+              <code>NEXTX_CODEX_ARGS="app-server --stdio"</code>
+              <code>VITE_BACKEND_URL=http://127.0.0.1:34121</code>
+            </div>
+            <div class="build-block">
+              <div class="mini-title">package</div>
+              <code>./scripts/build-sidecars.sh</code>
+              <code>cd apps/desktop</code>
+              <code>npm run tauri build</code>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./main.js" type="module"></script>
+  </body>
+</html>
