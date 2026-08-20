@@ -9,7 +9,7 @@
     />
     <title>NextX Agent</title>
     <link rel="icon" href="./favicon.ico" sizes="any" />
-    <link rel="stylesheet" href="./styles.css?v=5" />
+    <link rel="stylesheet" href="./styles.css?v=8" />
   </head>
   <body>
     <div class="page-shell">
@@ -56,18 +56,36 @@
               </p>
 
               <div class="download-row" aria-label="Application downloads">
-                <a class="download-button primary" href="https://github.com/bitfaner/next-x/releases/tag/v1.0.0" target="_blank" rel="noreferrer">
-                  <span class="download-platform">macOS</span>
-                  <span class="download-meta">Download app</span>
-                </a>
-                <a class="download-button" href="https://github.com/bitfaner/next-x/releases/tag/v1.0.0" target="_blank" rel="noreferrer">
-                  <span class="download-platform">Windows</span>
-                  <span class="download-meta">Download app</span>
-                </a>
-                <a class="download-button" href="https://github.com/bitfaner/next-x/releases/tag/v1.0.0" target="_blank" rel="noreferrer">
-                  <span class="download-platform">Ubuntu</span>
-                  <span class="download-meta">Download app</span>
-                </a>
+                <div class="download-menu">
+                  <button class="download-button primary" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="download-options-ubuntu">
+                    <span class="download-platform">Ubuntu</span>
+                    <span class="download-meta">Choose architecture</span>
+                  </button>
+                  <div class="download-options" id="download-options-ubuntu" role="menu">
+                    <a href="http://mztrade99.oss-cn-qingdao.aliyuncs.com/nextx/NextX.deb" role="menuitem">x86</a>
+                    <button type="button" role="menuitem" aria-disabled="true" disabled>arm</button>
+                  </div>
+                </div>
+                <div class="download-menu">
+                  <button class="download-button" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="download-options-macos">
+                    <span class="download-platform">macOS</span>
+                    <span class="download-meta">Choose architecture</span>
+                  </button>
+                  <div class="download-options" id="download-options-macos" role="menu">
+                    <a href="http://mztrade99.oss-cn-qingdao.aliyuncs.com/nextx/NextX.dmg" role="menuitem">x86</a>
+                    <button type="button" role="menuitem" aria-disabled="true" disabled>arm</button>
+                  </div>
+                </div>
+                <div class="download-menu">
+                  <button class="download-button" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="download-options-windows">
+                    <span class="download-platform">Windows</span>
+                    <span class="download-meta">Choose architecture</span>
+                  </button>
+                  <div class="download-options" id="download-options-windows" role="menu">
+                    <a href="http://mztrade99.oss-cn-qingdao.aliyuncs.com/nextx/NextX.msi" role="menuitem">x86</a>
+                    <button type="button" role="menuitem" aria-disabled="true" disabled>arm</button>
+                  </div>
+                </div>
               </div>
 
               <div class="command-strip" aria-label="Quick start">
@@ -221,6 +239,6 @@
       </main>
     </div>
 
-    <script src="./main.js?v=5" defer></script>
+    <script src="./main.js?v=6" defer></script>
   </body>
 </html>

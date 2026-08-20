@@ -1,5 +1,6 @@
 const feed = document.getElementById("stream-feed");
 const copyButton = document.querySelector(".copy-button");
+const downloadMenus = document.querySelectorAll(".download-menu");
 
 const events = [
   {
@@ -91,3 +92,39 @@ if (copyButton) {
     }
   });
 }
+
+function closeDownloadMenus(except = null) {
+  downloadMenus.forEach((menu) => {
+    if (menu === except) return;
+    menu.classList.remove("is-open");
+    const button = menu.querySelector(".download-button");
+    if (button) button.setAttribute("aria-expanded", "false");
+  });
+}
+
+downloadMenus.forEach((menu) => {
+  const button = menu.querySelector(".download-button");
+  if (!button) return;
+
+  button.addEventListener("click", () => {
+    const isOpen = menu.classList.contains("is-open");
+    closeDownloadMenus(isOpen ? null : menu);
+    if (!isOpen) {
+      menu.classList.add("is-open");
+      button.setAttribute("aria-expanded", "true");
+    }
+  });
+
+  menu.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeDownloadMenus();
+      button.focus();
+    }
+  });
+});
+
+document.addEventListener("click", (event) => {
+  if (!(event.target instanceof Element) || !event.target.closest(".download-menu")) {
+    closeDownloadMenus();
+  }
+});

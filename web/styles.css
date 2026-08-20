@@ -197,7 +197,15 @@ code {
   margin-top: 26px;
 }
 
+.download-menu {
+  position: relative;
+}
+
 .download-button {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
   display: grid;
   gap: 4px;
   min-height: 64px;
@@ -206,6 +214,61 @@ code {
   border-radius: 8px;
   background: rgba(17, 23, 29, 0.6);
   color: var(--text);
+}
+
+.download-options {
+  position: absolute;
+  z-index: 3;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  display: grid;
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #151c22;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-5px);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.download-menu.is-open .download-options {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.download-options a,
+.download-options button {
+  display: block;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.88rem;
+  text-align: left;
+}
+
+.download-options a:hover,
+.download-options a:focus-visible {
+  outline: none;
+  background: rgba(151, 212, 106, 0.14);
+  color: var(--green);
+}
+
+.download-options button[aria-disabled="true"],
+.download-options button[aria-disabled="true"]:hover {
+  color: var(--muted-2);
+  cursor: default;
+  background: transparent;
 }
 
 .download-button.primary {
