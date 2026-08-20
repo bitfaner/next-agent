@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use tauri::{Manager, State};
+use tauri::{AppHandle, Manager, State};
 use tauri_plugin_shell::{process::CommandEvent, ShellExt};
 
 const BACKEND_URL: &str = "http://127.0.0.1:34121";
@@ -45,8 +45,16 @@ fn spawn_backend(app: &tauri::AppHandle) {
     }
 }
 
+fn stop_backend(app: &AppHandle) {
+    let state = app.state::<BackendState>();
+    let child = state.child.lock().expect("backend state poisoned").take();
+    if let Some(child) = child {
+        let _ = child.kill();
+    }
+}
+
 pub fn run() {
-    tauri::Builder::default()
+    let app = tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
         .manage(BackendState {
@@ -54,6 +62,16 @@ pub fn run() {
         })
         .setup(|app| {
             spawn_backend(app.handle());
+            if let Some(window) = app.get_webview_window("main") {
+                if let Err(err) = window.show() {
+                    eprintln!("failed to show main window: {err}");
+                }
+                if let Err(err) = window.set_focus() {
+                    eprintln!("failed to focus main window: {err}");
+                }
+            } else {
+                eprintln!("main window was not created");
+            }
             Ok(())
         })
         .on_window_event(|window, event| {
@@ -66,6 +84,15 @@ pub fn run() {
             }
         })
         .invoke_handler(tauri::generate_handler![backend_base_url])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application");
+
+    app.run(|app_handle, event| {
+        if matches!(
+            event,
+            tauri::RunEvent::Exit | tauri::RunEvent::ExitRequested { .. }
+        ) {
+            stop_backend(app_handle);
+        }
+    });
 }

@@ -41,6 +41,36 @@ func TestConfigCommandFindsCodexInNVMDir(t *testing.T) {
 	}
 }
 
+func TestConfigCommandPrefersNewestNVMNodeVersion(t *testing.T) {
+	home := t.TempDir()
+	for _, version := range []string{"v12.22.12", "v20.20.2", "v24.18.0"} {
+		binDir := filepath.Join(home, ".nvm", "versions", "node", version, "bin")
+		if err := os.MkdirAll(binDir, 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(binDir, "codex"), []byte("#!/bin/sh\n"), 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
+	t.Setenv("APPDATA", filepath.Join(home, "AppData", "Roaming"))
+	t.Setenv("LOCALAPPDATA", filepath.Join(home, "AppData", "Local"))
+	t.Setenv("PATH", "")
+
+	want := filepath.Join(home, ".nvm", "versions", "node", "v24.18.0", "bin", "codex")
+	bin, env, err := Config{Bin: "codex"}.command()
+	if err != nil {
+		t.Fatalf("command returned error: %v", err)
+	}
+	if bin != want {
+		t.Fatalf("bin = %q, want %q", bin, want)
+	}
+	if !envHasPathDir(env, filepath.Dir(want)) {
+		t.Fatalf("PATH does not include newest NVM bin dir %q: %#v", filepath.Dir(want), env)
+	}
+}
+
 func TestConfigCommandAddsAbsoluteBinDirToPath(t *testing.T) {
 	dir := t.TempDir()
 	codexPath := filepath.Join(dir, "codex")

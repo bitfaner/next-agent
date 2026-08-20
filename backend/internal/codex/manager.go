@@ -12,6 +12,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -77,11 +78,43 @@ func commonUserBinDirs() []string {
 		"/opt/homebrew/bin",
 	}
 	nvmDirs, _ := filepath.Glob(filepath.Join(home, ".nvm", "versions", "node", "*", "bin"))
+	sort.SliceStable(nvmDirs, func(i, j int) bool {
+		return compareNodeVersions(nvmVersion(nvmDirs[i]), nvmVersion(nvmDirs[j])) > 0
+	})
 	dirs = append(dirs, nvmDirs...)
 	if runtime.GOOS == "windows" {
 		dirs = append(dirs, commonWindowsBinDirs(home)...)
 	}
 	return dirs
+}
+
+func nvmVersion(binDir string) string {
+	return filepath.Base(filepath.Dir(binDir))
+}
+
+func compareNodeVersions(left, right string) int {
+	leftParts := strings.Split(strings.TrimPrefix(left, "v"), ".")
+	rightParts := strings.Split(strings.TrimPrefix(right, "v"), ".")
+	partCount := len(leftParts)
+	if len(rightParts) > partCount {
+		partCount = len(rightParts)
+	}
+	for i := 0; i < partCount; i++ {
+		leftPart, rightPart := 0, 0
+		if i < len(leftParts) {
+			leftPart, _ = strconv.Atoi(leftParts[i])
+		}
+		if i < len(rightParts) {
+			rightPart, _ = strconv.Atoi(rightParts[i])
+		}
+		if leftPart > rightPart {
+			return 1
+		}
+		if leftPart < rightPart {
+			return -1
+		}
+	}
+	return 0
 }
 
 func commonWindowsBinDirs(home string) []string {
